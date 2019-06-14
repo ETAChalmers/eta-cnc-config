@@ -2,9 +2,9 @@
 # If you make changes to this file, they will be
 # overwritten when you run stepconf again
 loadrt trivkins
-loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD traj_period_nsec=[EMCMOT]SERVO_PERIOD key=[EMCMOT]SHMEM_KEY num_joints=[TRAJ]AXES
-loadrt probe_parport
-loadrt hal_parport cfg="0x0378 in 0xccb8 in 0xccb0 out"
+loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EMCMOT]SERVO_PERIOD traj_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+#loadrt probe_parport
+loadrt hal_parport cfg="0x0378 in 0xccb8 out 0xccb0 in"
 setp parport.1.reset-time 4000
 loadrt stepgen step_type=0,0,0
 
