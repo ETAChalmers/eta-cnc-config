@@ -67,7 +67,7 @@ linksp encB3 encoder.2.phase-B
 linksp encA4 encoder.3.phase-A
 linksp encB4 encoder.3.phase-B
 
-#jogwheel stuff
+	#jogwheel stuff
 #make this your counts/unit
 setp encoder.0.position-scale -1
 setp encoder.1.position-scale -1
@@ -77,27 +77,44 @@ addf encoder.update-counters    base-thread
 addf encoder.capture-position	servo-thread 
 
 #next connect the output from the encoder counters to motion jog X
-net mpg-x encoder.0.counts
-net mpg-y encoder.1.counts
-net mpg-z encoder.2.counts
+newsig jogwheel-pos1 s32
+linkps encoder.0.counts => jogwheel-pos1
+linksp jogwheel-pos1 => axis.0.jog-counts
 
-net mpg-x axis.0.jog-counts
-net mpg-y axis.1.jog-counts
-net mpg-z axis.2.jog-counts
+newsig jogwheel-pos2 s32
+linkps encoder.1.counts => jogwheel-pos2
+linksp jogwheel-pos2 => axis.2.jog-counts
+
+newsig jogwheel-pos3 s32
+linkps encoder.2.counts => jogwheel-pos3
+linksp jogwheel-pos3 => axis.1.jog-counts
 
 #next enable the jogwheel jogging
-setp axis.0.jog-enable 1
-setp axis.1.jog-enable 1
-setp axis.2.jog-enable 1
+newsig enablejog bit
+linksp enablejog => axis.0.jog-enable
+linksp enablejog => axis.1.jog-enable
+linksp enablejog => axis.2.jog-enable
+
+#set it to 1
+sets enablejog 1
 
 newsig jogscale float
 sets jogscale 0.01
+setp encoder.0.x4-mode 1
+setp encoder.1.x4-mode 1
+setp encoder.2.x4-mode 1
+
+
+#linksp Xphase-A parport.0.pin-02-out    <-- WTF?
+
 
 linksp jogscale => axis.0.jog-scale
 linksp jogscale => axis.1.jog-scale
 linksp jogscale => axis.2.jog-scale
 
-#feedwheel stuff
+	#feedwheel stuff
+
+setp encoder.2.x4-mode 1
 
 newsig scale float
 sets scale 0.01
