@@ -1,0 +1,124 @@
+######################################
+# HAL code for external control box##
+######################################
+
+
+######################################
+# Program start/pause button #########
+######################################
+
+#newsig runsignal bit 
+net runsignal parport.0.pin-12-in-not halui.program.resume
+
+#newsig stopsignal bit
+net stopsignal parport.0.pin-11-in-not halui.program.pause
+
+
+######################################
+# spindle ###########################
+######################################
+#input
+net spindle_start_custom parport.0.pin-13-in-not halui.spindle.start
+net spindle_stop_custom parport.0.pin-10-in-not halui.spindle.stop
+
+#output
+# create a signal for "spindle on"
+newsig spindle_on bit
+
+# connect it to the iocontroller
+#linksp spindle_on motion.spindle-on
+# connect it to a physical pin
+#linksp spindle_on parport.0.pin-04-out
+
+
+
+######################################
+# feed/jogwheels #####################
+######################################
+
+# add 3 encoder counter modules
+loadrt encoder num_chan=4
+
+#signals to connect the encoders to parport
+newsig encA1 bit
+newsig encB1 bit
+newsig encA2 bit
+newsig encB2 bit
+newsig encA3 bit
+newsig encB3 bit
+newsig encA4 bit
+newsig encB4 bit
+
+linksp encA1 parport.0.pin-03-in
+linksp encB1 parport.0.pin-02-in
+linksp encA2 parport.0.pin-06-in
+linksp encB2 parport.0.pin-07-in
+linksp encA3 parport.0.pin-05-in
+linksp encB3 parport.0.pin-04-in
+linksp encA4 parport.0.pin-09-in
+linksp encB4 parport.0.pin-08-in
+
+linksp encA1 encoder.0.phase-A
+linksp encB1 encoder.0.phase-B
+linksp encA2 encoder.1.phase-A
+linksp encB2 encoder.1.phase-B
+linksp encA3 encoder.2.phase-A
+linksp encB3 encoder.2.phase-B
+linksp encA4 encoder.3.phase-A
+linksp encB4 encoder.3.phase-B
+
+	#jogwheel stuff
+#make this your counts/unit
+setp encoder.0.position-scale -1
+setp encoder.1.position-scale -1
+setp encoder.2.position-scale 1
+
+addf encoder.update-counters    base-thread 
+addf encoder.capture-position	servo-thread 
+
+#next connect the output from the encoder counters to motion jog X
+newsig jogwheel-pos1 s32
+linkps encoder.0.counts => jogwheel-pos1
+linksp jogwheel-pos1 => axis.0.jog-counts
+
+newsig jogwheel-pos2 s32
+linkps encoder.1.counts => jogwheel-pos2
+linksp jogwheel-pos2 => axis.2.jog-counts
+
+newsig jogwheel-pos3 s32
+linkps encoder.2.counts => jogwheel-pos3
+linksp jogwheel-pos3 => axis.1.jog-counts
+
+#next enable the jogwheel jogging
+newsig enablejog bit
+linksp enablejog => axis.0.jog-enable
+linksp enablejog => axis.1.jog-enable
+linksp enablejog => axis.2.jog-enable
+
+#set it to 1
+sets enablejog 1
+
+newsig jogscale float
+sets jogscale 0.01
+setp encoder.0.x4-mode 1
+setp encoder.1.x4-mode 1
+setp encoder.2.x4-mode 1
+
+
+#linksp Xphase-A parport.0.pin-02-out    <-- WTF?
+
+
+linksp jogscale => axis.0.jog-scale
+linksp jogscale => axis.1.jog-scale
+linksp jogscale => axis.2.jog-scale
+
+	#feedwheel stuff
+
+setp encoder.2.x4-mode 1
+
+newsig scale float
+sets scale 0.01
+linksp scale halui.feed-override.scale
+
+net encoder_counts_custom halui.feed-override.counts encoder.3.counts
+
