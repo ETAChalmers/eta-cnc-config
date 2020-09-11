@@ -27,7 +27,7 @@
   <property name="floatsin" type="float" value="10.0"/>
   <property name="floatsout" type="float" value="10.0"/>
   <property name="halui" type="bool" value="True"/>
-  <property name="ioaddr" type="string" value="0x0378 0xccb0 0xccb8"/>
+  <property name="ioaddr" type="string" value="0x0378"/>
   <property name="ioaddr2" type="string" value="1"/>
   <property name="ioaddr3" type="string" value="2"/>
   <property name="ladderconnect" type="bool" value="True"/>
