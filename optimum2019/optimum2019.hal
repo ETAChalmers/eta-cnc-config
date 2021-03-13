@@ -6,10 +6,11 @@ loadrt [EMCMOT]EMCMOT base_period_nsec=[EMCMOT]BASE_PERIOD servo_period_nsec=[EM
 #loadrt probe_parport
 
 ### Define parallel port addresses 
+# View connected parports by entering 'dmesg | grep parport' into the terminal
 # Port 0: Jog box input
 # Port 1: Motor outputs
 # Port 2: Endstop input
-loadrt hal_parport cfg="0x0378 in 0xe070 out 0xe050 in"
+loadrt hal_parport cfg="0x0378 in 0xdcb8 out 0xdcb0 in"
 
 setp parport.1.reset-time 4000
 loadrt stepgen step_type=0,0,0
